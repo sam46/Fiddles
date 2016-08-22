@@ -61,17 +61,17 @@ function Particle(CX,CY,R) {
 		this.pos.add(this.vel);
 
 		var wiggle = new Vector.random2D();
-		wiggle.normalize();
+		//wiggle.normalize();
 		wiggle.mult(1);
 		this.pos.add(wiggle);
 	};	
 
 	this.draw = function(ctx){		
-		ctx.fillStyle = "rgba(255,0,0,0.1)";
-		ctx.beginPath();
-	    ctx.arc(this.ctr.x, this.ctr.y, this.r, 0, 2*Math.PI);
-	    ctx.fill();
-	    ctx.closePath();
+		// ctx.fillStyle = "rgba(255,0,0,0.1)";
+		// ctx.beginPath();
+	 //    ctx.arc(this.ctr.x, this.ctr.y, this.r, 0, 2*Math.PI);
+	 //    ctx.fill();
+	 //    ctx.closePath();
 
 		ctx.fillStyle = "rgb(25,25,25)";
 		ctx.beginPath();
@@ -96,16 +96,18 @@ Particle.prototype.constrain = function(m,rad) { // assumes rad is way bigger th
 
 function PSys(){
 	var parts = [];
-	addRing(30,250);
-	addRing(10,100);
-	addRing(20,175);
-	addRing(5,45);
 
-	function addRing(count,radius) {
+	for (var i = 1; i <= 10; i++) {
+		addRing(i*50, i*25, 3);
+	}
+	this.count = parts.length;
+
+
+	function addRing(count,radius,pRad) {
 		var ang = Math.random()*Math.PI*2, incr = Math.PI*2.0/count;
 		for(var i=0; i < count; i++) {
 			parts.push(
-				new Particle(width/2.0+Math.cos(ang)*radius, height/2.0+Math.sin(ang)*radius, 10.0, 0,0)
+				new Particle(width/2.0+Math.cos(ang)*radius, height/2.0+Math.sin(ang)*radius, pRad, 0,0)
 			);
 			ang += incr;
 		}
@@ -162,6 +164,12 @@ window.onload = function() {
 		context.arc(Mouse.x, Mouse.y, Mouse.r, 0, 2*Math.PI);
 		context.fill();
 		context.closePath();
+
+
+		context.textAlign = 'left';
+	    context.font = '25px sans-serif';
+	    context.fillStyle = 'gray';
+		context.fillText(psystem.count, 25, 30);
 
 		requestAnimationFrame(run);
 	}	
