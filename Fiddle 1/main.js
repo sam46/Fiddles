@@ -12,7 +12,7 @@ function distSq(v1,v2){
 function Particle(CX,CY,R) {
 //function Particle(CX,CY,R,M,M2){
 	this.ctr = new Vector(CX,CY);
-	this.pos = new Vector(CX,CY);
+	this.pos = new Vector(Math.random()*width, Math.random()* height);
 	this.vel = new Vector(0.0,0.0);
 	this.r = R;
 	// this.acc = new Vector(0.0,0.0);
@@ -75,7 +75,8 @@ function Particle(CX,CY,R) {
 		ctx.beginPath();
 	    ctx.arc(this.pos.x, this.pos.y, this.r, 0, 2*Math.PI);
 	    ctx.fill();
-	    ctx.closePath();	
+	    ctx.closePath();			
+
 	};
 
 }
