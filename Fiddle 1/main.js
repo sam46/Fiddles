@@ -71,11 +71,11 @@ function Particle(CX,CY,R) {
 	 //    ctx.fill();
 	 //    ctx.closePath();
 
-		ctx.fillStyle = "rgb(25,25,25)";
+		ctx.fillStyle = "#6D6A60";
 		ctx.beginPath();
 	    ctx.arc(this.pos.x, this.pos.y, this.r, 0, 2*Math.PI);
 	    ctx.fill();
-	    ctx.closePath();
+	    ctx.closePath();	
 	};
 
 }
@@ -96,7 +96,7 @@ function PSys(){
 	var parts = [];
 
 	for (var i = 1; i <= 10; i++) {
-		addRing(i*50, i*25, 3);
+		addRing(i*60, i*25, 1);
 	}
 	this.count = parts.length;
 
