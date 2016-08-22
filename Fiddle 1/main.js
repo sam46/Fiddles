@@ -2,7 +2,7 @@ var width, height;
 var Mouse = {
 	x: 0.0,
 	y: 0.0,
-	r: 200.0
+	r: 150.0
 };
 
 function distSq(v1,v2){
@@ -19,12 +19,12 @@ function Particle(CX,CY,R) {
 	// this.gforce = new Vector(0.0,0.0);
 	// this.m = M;
 	// this.m2 = M2; 	
-	var gconst = 10.0;
+	var gconst = 30.0;
 
-	this.applyForce = function(Force){
-		var fAcc = new Vector(Force.x/this.m, Force.y/this.m);				// a = F/m
-		this.acc.add(fAcc);
-	};
+	// this.applyForce = function(Force){
+	// 	var fAcc = new Vector(Force.x/this.m, Force.y/this.m);				// a = F/m
+	// 	this.acc.add(fAcc);
+	// };
 
 	this.update = function() {
 		// calculate the G force: newton law of universal gravitation
@@ -33,7 +33,7 @@ function Particle(CX,CY,R) {
 		var gforce = new Vector(Math.round((this.ctr.x - this.pos.x)*1000.0)/1000.0, Math.round((this.ctr.y - this.pos.y)*1000.0)/1000.0);
 		gforce.normalize();
 		var dist = Math.sqrt(distSq(this.pos, this.ctr));
-		dist = Math.min(dist, 500.0) / 500.0;	
+		dist = Math.min(dist, 1000.0) / 1000.0;	
 		gforce.mult(dist * gconst);	
 
 		// if(Math.abs(distSquare) > 1){
@@ -60,10 +60,8 @@ function Particle(CX,CY,R) {
 		this.vel.mult(0.92);
 		this.pos.add(this.vel);
 
-		var wiggle = new Vector.random2D();
-		//wiggle.normalize();
-		wiggle.mult(1);
-		this.pos.add(wiggle);
+		// give it some jiggle
+		this.pos.add(new Vector.random2D());
 	};	
 
 	this.draw = function(ctx){		
@@ -89,7 +87,7 @@ Particle.prototype.constrain = function(m,rad) { // assumes rad is way bigger th
 		var interleave = 1 - (rad - dist)/rad;
 		var push = new Vector(this.pos.x - m.x, this.pos.y - m.y);
 		push.normalize();
-		push.mult(interleave * 10);
+		push.mult(interleave * 20);
 		this.vel.add(push);
 	}
 };
@@ -101,7 +99,6 @@ function PSys(){
 		addRing(i*50, i*25, 3);
 	}
 	this.count = parts.length;
-
 
 	function addRing(count,radius,pRad) {
 		var ang = Math.random()*Math.PI*2, incr = Math.PI*2.0/count;
@@ -129,6 +126,7 @@ window.onload = function() {
 	width = canvas.width = window.innerWidth;
 	height = canvas.height = window.innerHeight;
 	var psystem = new PSys();
+	var showMouse = false;
 	addEventListeners();
 	run();
 
@@ -142,7 +140,7 @@ window.onload = function() {
 		});
 
 		document.body.addEventListener("mousedown", function(event) {
-
+			showMouse = !showMouse;
 		});
 
 		document.body.addEventListener("wheel", function(WheelEvent) {
@@ -159,17 +157,19 @@ window.onload = function() {
 		psystem.draw(context);
 
 		// draw mouse's circle
-		context.fillStyle = "rgba(255,25,25,0.4)";
-		context.beginPath();
-		context.arc(Mouse.x, Mouse.y, Mouse.r, 0, 2*Math.PI);
-		context.fill();
-		context.closePath();
-
-
+		if(showMouse){
+			context.fillStyle = "rgba(255,0,25,0.2)";
+			context.beginPath();
+			context.arc(Mouse.x, Mouse.y, Mouse.r, 0, 2*Math.PI);
+			context.fill();
+			context.closePath();
+		}
 		context.textAlign = 'left';
-	    context.font = '25px sans-serif';
+	    context.font = '20px sans-serif';
 	    context.fillStyle = 'gray';
-		context.fillText(psystem.count, 25, 30);
+		context.fillText("particles: "+psystem.count, 25, 30);
+		context.fillText("mouse click: show effect circle", 25, 60);
+		context.fillText("mouse wheel: change effect radius", 25, 90);
 
 		requestAnimationFrame(run);
 	}	
