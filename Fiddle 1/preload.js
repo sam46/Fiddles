@@ -8,7 +8,8 @@ function loadImages() { // create imageObject for each image in the Letters fold
     for (var i = 0; i < 26; i++) {
     	var img = new Image();
     	img.i = i;	
-
+    	img.crossOrigin = "Anonymous";
+    	
     	img.addEventListener("load", function() {
 		    var tempCanvas = document.createElement('canvas');
 			tempCanvas.height = this.height;

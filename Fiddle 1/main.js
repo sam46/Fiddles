@@ -15,6 +15,7 @@ function Particle(CX,CY,R) {
 	this.pos = new Vector(Math.random()*width, Math.random()* height);
 	this.vel = new Vector(0.0,0.0);
 	this.r = R;
+	this.jiggle = 1.0;
 	// this.acc = new Vector(0.0,0.0);
 	// this.gforce = new Vector(0.0,0.0);
 	// this.m = M;
@@ -61,7 +62,7 @@ function Particle(CX,CY,R) {
 		this.pos.add(this.vel);
 
 		// give it some jiggle
-		this.pos.add(new Vector.random2D());
+		this.pos.add((new Vector.random2D()).mult(this.jiggle));
 	};	
 
 	this.draw = function(ctx){		
@@ -135,7 +136,7 @@ function imageToParticles(imgObj, scaleX, scaleY, offX, offY,rad) {
 		var nonWhite = (imgObj.data[i] < bar)  || (imgObj.data[i + 1] < bar) || (imgObj.data[i + 2] < bar);
 
 		if(nonWhite)
-			if( Math.random() < 0.5)	// too many pixels/particles!! We'll introduce a chance to whether we'll create a particle or not
+			if( Math.random() < 0.3)	// too many pixels/particles!! We'll introduce a chance to whether we'll create a particle or not
 				parts.push(new Particle(x*scaleX + offX, y*scaleY + offY, rad));
 	}
 
@@ -152,7 +153,12 @@ window.onload = function() {
 	var btn = document.getElementById('btn');
 	var txt = document.getElementById('txt');
 	var letters = [];
-
+	var randomParticles = [];
+	for (var i = 0; i < 300; i++) {
+		var temp = new Particle(Math.random()*width, Math.random()*height,1);
+		temp.jiggle = 1 + Math.random()*5;
+		randomParticles.push(temp);	
+	}
 
 	addEventListeners();
 	setupNewWord("test");
@@ -160,12 +166,24 @@ window.onload = function() {
 
 	function setupNewWord(word) {	
 		word = word.toLowerCase();
-		var perLine = 5, spacing = 150, scl = 2;
+		var perLine = 5, 	// letters per line
+			spacing = 0, // spacing between letters
+			scl = 2;	// scale the letter 
 		letters = [];
+
+		var lastEnd = 0;	// the last particle's x position of the previous letter
 		for(var i = 0; i < word.length; i++) {
 			var ascii = word.charCodeAt(i);
+
 			if(ascii < 97 || ascii > 122) continue;
-			letters.push(imageToParticles(images[ascii - 97],scl,scl, 50+ scl*((i*spacing)%(spacing*perLine)), height/2 - 100, 2));
+			if(i == 0){
+				letters.push(imageToParticles(images[ascii - 97],scl,scl, 50,  height/2 - 100, 2));
+				lastEnd += 50 + images[ascii - 97].w*scl + spacing;
+				continue;
+			}
+
+			letters.push(imageToParticles(images[ascii - 97],scl,scl, lastEnd + spacing,  height/2 - 100, 2));
+			lastEnd += images[ascii - 97].w*scl + spacing;
 		}
 	}
 
@@ -201,7 +219,14 @@ window.onload = function() {
 		// psystem.update();
 		// psystem.draw(context);
 
-		var partsCount = 0;
+		var partsCount = 20;
+
+		partsCount += randomParticles.length;
+		for (var i = 0; i < randomParticles.length; i++) {
+			randomParticles[i].update();
+			randomParticles[i].draw(context);
+		}
+
 		for(var j =0; j <letters.length; j++){
 		 	var parts = letters[j];
 		 	partsCount += parts.length;
@@ -210,6 +235,9 @@ window.onload = function() {
 				parts[i].draw(context);
 		 	}
 		 }
+
+
+
 
 		// draw mouse's circle
 		if(showMouse){
