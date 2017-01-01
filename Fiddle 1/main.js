@@ -123,6 +123,7 @@ Particle.prototype.constrain = function(m,rad) { // assumes rad is way bigger th
 // 	};
 // };
 
+
 // creates a particle array from an image with particles positioned at non-white pixels
 function imageToParticles(imgObj, scaleX, scaleY, offX, offY,rad) { 
 	var parts = [];
@@ -132,12 +133,19 @@ function imageToParticles(imgObj, scaleX, scaleY, offX, offY,rad) {
 		var x = px % imgObj.w,
 			y = px / imgObj.w;
 		// we'll accept a pixel if it's non-white (its R, G and B values are less than a whitness bar)  (ignoreing alpha)
-		var bar = 200
-		var nonWhite = (imgObj.data[i] < bar)  || (imgObj.data[i + 1] < bar) || (imgObj.data[i + 2] < bar);
+		var score = colorCriteria(imgObj.data[i], imgObj.data[i + 1], imgObj.data[i + 2]);
+		// limit the number of particles as it can get very large:
+		if(score < 0.1) continue; // if the pixel is very white
+		if(Math.random() < 0.5) continue;	
 
-		if(nonWhite)
-			if( Math.random() < 0.3)	// too many pixels/particles!! We'll introduce a chance to whether we'll create a particle or not
-				parts.push(new Particle(x*scaleX + offX, y*scaleY + offY, rad));
+		parts.push(new Particle(x*scaleX + offX, y*scaleY + offY, rad*score));
+	}
+
+
+	function colorCriteria(r,g,b){
+		// could be improved further
+		var avg = ((r + g + b)/3.0)/ 255.0;	// normalized
+		return 1 - avg;
 	}
 
 	 return parts;
